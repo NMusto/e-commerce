@@ -1,4 +1,5 @@
 
+
 import fs from 'fs';
 
 
@@ -6,7 +7,8 @@ const fileName = './src/products.json';
 
 class ProductManager {
     
-    getProducts = async() =>{
+    getProducts = async () => {
+        
         try {
             const products = await fs.promises.readFile(fileName, 'utf-8');
             return JSON.parse(products);
@@ -43,6 +45,8 @@ class ProductManager {
     }
 
 }
+
+export default ProductManager;
     
 /* ----Pruebas--- */
 
