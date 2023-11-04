@@ -12,11 +12,33 @@ app.get('/', (req,res) => {
     res.json('Bienvenido al e-commerce!');
 })
 
-app.get('/products', (req,res) => {
+app.get('/products', async(req,res) => {
+    const { limit } = req.query;
+    
     const productManager = new ProductManager();
-    const products = productManager.getProducts();
-    products.then( datos => res.json(datos) )
-    products.catch( error => res.json(error) )
+    const products = await productManager.getProducts();
+    
+    if(!limit) res.json(products);
+    else {
+        const limitProducts = products.slice(0,limit);
+        res.json(limitProducts);
+    }
+})
+
+app.get('/products/:id', async(req,res) => {
+    try {
+        const { id } = req.params;
+        
+        const productManager = new ProductManager();
+        const product = await productManager.getProductByID(id);
+        
+        if( !product ) res.json(`Id ${id} inexistente`);
+        res.json(product);
+    }
+    catch (error) {
+        res.send(`Error en recuperar el producto`);
+    }
+    
 })
 
 app.post('/products', (req,res) => {

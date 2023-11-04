@@ -1,5 +1,3 @@
-
-
 import fs from 'fs';
 
 
@@ -14,9 +12,15 @@ class ProductManager {
             return JSON.parse(products);
         }
         catch(e) {
-            console.log('No se encontró el archivo', e);
-            return [];
+            return ('Error', e.message);
         }
+    }
+
+    getProductByID = async(id) => {
+            const products = await this.getProducts();
+        
+            const product = products.find( product => product.id == id);
+            return product;
     }
 
     addProducts = async( {title, description, price, thumbnail, stock} ) =>{
@@ -47,39 +51,3 @@ class ProductManager {
 }
 
 export default ProductManager;
-    
-/* ----Pruebas--- */
-
-//const productManager = new ProductManager();
-
-/* 
-productManager.addProducts({
-    code: 1,
-    title: 'Smart TV Samsung',
-    description: 'Smart Led Tv Samsung 55 pulgadas 4K UHD',
-    price: 355000,
-    thumbnail: 'image01-SmartTVSamsung',
-    stock: 20
-})
-
-productManager.addProducts({
-    code: 2,
-    title: 'Celular Motorola Edge 30',
-    description: 'Celular Motorola Edge 30 Ultra/XT2241-2',
-    price: 475000,
-    thumbnail: 'image01-CelularMotorolaEdge30',
-    stock: 30
-})
-
-productManager.addProducts({
-    code: 3,
-    title: 'Notebook Dell Inspiron 15',
-    description: 'Notebook Dell Inspiron 15 3511 Intel Core i5',
-    price: 700000,
-    thumbnail: 'image01-NotebookDell',
-    stock: 10
-})
- */
-
-/* const products = await productManager.getProducts();
-console.log( products ); */
