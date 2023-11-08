@@ -7,7 +7,13 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
+const defaultController = (req,res) => {
+    const { url, method } = req;
+    res.status(404).send(`La ruta ${url} del método ${method} no se encontró`);
+}
 
+
+//GET
 app.get('/', (req,res) => {
     res.json('Bienvenido al e-commerce!');
 })
@@ -41,6 +47,9 @@ app.get('/products/:id', async(req,res) => {
     
 })
 
+app.get('*', defaultController);
+
+//POST
 app.post('/products', (req,res) => {
     const product = req.body;
     
@@ -50,6 +59,9 @@ app.post('/products', (req,res) => {
     msj.catch( error => res.json(error) )
 })
 
+app.post('*', defaultController);
+
+//PORT
 const PORT = 8080;
 app.listen(PORT, console.log(`Puerto escuchando en http://localhost:${PORT}`))
     .on('error', error => console.log(`Error: ${error.message}`));
