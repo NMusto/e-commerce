@@ -9,25 +9,30 @@ app.use(express.urlencoded({extended: true}));
 
 const defaultController = (req,res) => {
     const { url, method } = req;
-    res.status(404).send(`La ruta ${url} del método ${method} no se encontró`);
+    res.status(404).send(`${url} and ${method} do not exist `);
 }
 
 
 //GET
 app.get('/', (req,res) => {
-    res.json('Bienvenido al e-commerce!');
+    res.json('Welcome to e-commerce!');
 })
 
 app.get('/products', async(req,res) => {
-    const { limit } = req.query;
+    try {
+        const { limit } = req.query;
     
-    const productManager = new ProductManager();
-    const products = await productManager.getProducts();
-    
-    if(!limit) res.json(products);
-    else {
-        const limitProducts = products.slice(0,limit);
-        res.json(limitProducts);
+        const productManager = new ProductManager();
+        const products = await productManager.getProducts();
+        
+        if(!limit) res.json(products);
+        else {
+            const limitProducts = products.slice(0,limit);
+            res.json(limitProducts);
+        }
+    }
+    catch(error) {
+        res.json({error: error.message});
     }
 })
 
@@ -38,11 +43,11 @@ app.get('/products/:id', async(req,res) => {
         const productManager = new ProductManager();
         const product = await productManager.getProductByID(id);
         
-        if( !product ) res.json(`Id ${id} inexistente`);
+        if( !product ) res.json(`Id ${id} does not exist`);
         res.json(product);
     }
     catch (error) {
-        res.send(`Error en recuperar el producto`);
+        res.send(error.message);
     }
     
 })
@@ -51,17 +56,57 @@ app.get('*', defaultController);
 
 //POST
 app.post('/products', (req,res) => {
-    const product = req.body;
+    try {
+        const product = req.body;
     
-    const productManager = new ProductManager();
-    const msj = productManager.addProducts(product);
-    msj.then( datos => res.json(datos) )
-    msj.catch( error => res.json(error) )
+        const productManager = new ProductManager();
+        const rtaAdd = productManager.addProduct(product);
+        rtaAdd.then( datos => res.json(datos) )
+        rtaAdd.catch( error => res.json(error) )
+    } 
+    catch(error) {
+        res.json({error: error.message});
+    }
 })
 
 app.post('*', defaultController);
 
+//PUT
+
+app.put('/products/:id', async(req,res) => {
+    try {
+        const { id } = req.params;
+        const body = req.body;
+
+        const productManager = new ProductManager();
+        const rtaUpdate = await productManager.updateProduct(id,body);
+        res.json(rtaUpdate);
+    } 
+    catch (error) {
+        res.json({error: error.message});
+    }
+})
+
+app.put('*', defaultController);
+
+//DELETE
+
+app.delete('/products/:id', async(req,res) => {
+    try {
+        const { id } = req.params;
+
+        const productManager = new ProductManager();
+        const rtaDelete = await productManager.deleteProduct(id);
+        res.json(rtaDelete);
+    } 
+    catch (error) {
+        res.json({error: error.message});
+    }
+})
+
+app.delete('*', defaultController);
+
 //PORT
 const PORT = 8080;
-app.listen(PORT, console.log(`Puerto escuchando en http://localhost:${PORT}`))
+app.listen(PORT, console.log(`Port listening on http://localhost:${PORT}`))
     .on('error', error => console.log(`Error: ${error.message}`));

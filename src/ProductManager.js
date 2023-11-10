@@ -8,13 +8,13 @@ class ProductManager {
     //Generador de id
     generateId = async() => {
         const products = await this.getProducts();
-        console.log(products.length);
+
         return String(products.length === 0 ? 1 : products.length + 1);
     }
 
     
-    //validación con Joi
-    validateProduct = (product) => {
+    //validación con Joi nuevo producto
+    validateAddProduct = (product) => {
         
         const ProductSchema = Joi.object({
             title: Joi.string().required(),
@@ -41,6 +41,35 @@ class ProductManager {
         }
     
     }
+
+    //validación con Joi actualizar producto
+    validateUpdateProduct = (product) => {
+        
+        const ProductSchema = Joi.object({
+            title: Joi.string(),
+            brand: Joi.string(),
+            description: Joi.string().max(50),
+            price: Joi.number().integer(),
+            thumbnail: Joi.string(),
+            stock: Joi.number().integer()
+        })    
+
+        const { error } = ProductSchema.validate(product);
+
+        if(error) {
+            return {
+                value: false,
+                error: error.details[0].message
+            }
+        }
+        else {
+            return {
+                value: true
+            }
+            
+        }
+    
+    }
     
     getProducts = async () => {
         
@@ -48,23 +77,28 @@ class ProductManager {
             const products = await fs.promises.readFile(fileName, 'utf-8');
             return JSON.parse(products);
         }
-        catch(e) {
-            return ('Error', e.message);
+        catch(error) {
+            return error.message;
         }
     }
 
     getProductByID = async(id) => {
+        try {
             const products = await this.getProducts();
         
             const product = products.find( product => product.id == id);
             return product;
+        }
+        catch(error) {
+            return error.message;
+        }
     }
 
-    addProducts = async(product) =>{
+    addProduct = async(product) =>{
         
         try {
 
-            const objRta = await this.validateProduct(product)
+            const objRta = this.validateAddProduct(product)
             if( objRta.value ) {
                 
                 const products = await this.getProducts();
@@ -75,13 +109,65 @@ class ProductManager {
                 products.push({id: await this.generateId(),...product});
 
                 await fs.promises.writeFile(fileName, JSON.stringify(products));    
-                return 'Producto agregado exitosamente!';
+                return 'Product successfully added!';
             }
             else {
                 return objRta.error;
             }
         } 
         catch (error) {
+            return error.message;
+        }
+    }
+
+    updateProduct = async(id,body) => {
+        
+        try {
+            const objRta = this.validateUpdateProduct(body);
+
+            if(objRta.value) {
+
+                const products = await this.getProducts();
+
+                const index = products.findIndex( product => product.id === id);
+                 if( index != -1 ) {
+
+                    const productUpdated = { ...products[index], ...body };
+                    products.splice(index,1,productUpdated);
+                    
+                    await fs.promises.writeFile(fileName, JSON.stringify(products));
+                    return productUpdated;
+                }
+                else 
+                    return 'Product not found!';
+            }
+            else {
+                return objRta.error;
+            }
+        }
+        catch(error) {
+            return error.message;
+        }
+    }
+
+    deleteProduct = async(id) => {
+        try {
+            const products = await this.getProducts();
+
+            const index = products.findIndex( product => product.id === id);
+            
+            if( index != -1 ) {
+                products.splice(index,1);
+    
+                await fs.promises.writeFile(fileName, JSON.stringify(products));
+    
+                return `Product id: ${id} successfully removed!`;
+            }
+            else {
+                return `Product id: ${id} does not exist`;
+            }
+        }
+        catch(error) {
             return error.message;
         }
     }
