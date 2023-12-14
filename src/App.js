@@ -1,6 +1,7 @@
 import express from 'express';
-import productsRouter from './routes/productsRouter.js'
-import defaultController from './routes/utils/defaultController.js';
+import productRouter from './routes/productRouter.js'
+import cartRouter from './routes/cartRouter.js'
+import defaultRouter from './routes/defaultRouter.js';
 
 const app = express();
 
@@ -16,8 +17,9 @@ app.get('/', (req,res) => {
 })
 
 
-app.use('/api/products', productsRouter);
-app.use('*', defaultController);
+app.use('/api/products', productRouter);
+app.use('/api/carts', cartRouter);
+app.use('*', defaultRouter);
 
 
 

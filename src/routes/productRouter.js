@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import ProductManager from '../ProductManager.js';
+import ProductManager from '../controllers/ProductManager.js';
 
-const productsRouter = Router();
+const productRouter = Router();
 
 
 //GET
-productsRouter.get('/', async(req,res) => {
+productRouter.get('/', async(req,res) => {
     try {
         const { limit } = req.query;
     
@@ -23,14 +23,14 @@ productsRouter.get('/', async(req,res) => {
     }
 })
 
-productsRouter.get('/:id', async(req,res) => {
+productRouter.get('/:pid', async(req,res) => {
     try {
-        const { id } = req.params;
+        const { pid } = req.params;
         
         const productManager = new ProductManager();
-        const product = await productManager.getProductByID(id);
+        const product = await productManager.getProductByID(pid);
         
-        if( !product ) res.json(`Id ${id} does not exist`);
+        if( !product ) res.json(`Id ${pid} does not exist`);
         res.json(product);
     }
     catch (error) {
@@ -41,7 +41,7 @@ productsRouter.get('/:id', async(req,res) => {
 
 
 //POST
-productsRouter.post('/', (req,res) => {
+productRouter.post('/', (req,res) => {
     try {
         const product = req.body;
     
@@ -57,13 +57,13 @@ productsRouter.post('/', (req,res) => {
 
 
 //PUT
-productsRouter.put('/:id', async(req,res) => {
+productRouter.put('/:pid', async(req,res) => {
     try {
-        const { id } = req.params;
+        const { pid } = req.params;
         const body = req.body;
 
         const productManager = new ProductManager();
-        const rtaUpdate = await productManager.updateProduct(id,body);
+        const rtaUpdate = await productManager.updateProduct(pid,body);
         res.json(rtaUpdate);
     } 
     catch (error) {
@@ -73,12 +73,12 @@ productsRouter.put('/:id', async(req,res) => {
 
 
 //DELETE
-productsRouter.delete('/:id', async(req,res) => {
+productRouter.delete('/:pid', async(req,res) => {
     try {
-        const { id } = req.params;
+        const { pid } = req.params;
 
         const productManager = new ProductManager();
-        const rtaDelete = await productManager.deleteProduct(id);
+        const rtaDelete = await productManager.deleteProduct(pid);
         res.json(rtaDelete);
     } 
     catch (error) {
@@ -89,4 +89,4 @@ productsRouter.delete('/:id', async(req,res) => {
 
 
 
-export default productsRouter;
+export default productRouter;

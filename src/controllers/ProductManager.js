@@ -1,15 +1,16 @@
 import fs from 'fs';
 import Joi from 'joi';
+import  __dirname  from '../../utils.js'
 
-const fileName = './src/products.json';
+
+const fileName = __dirname + '/src/api/products.json';
 
 class ProductManager {
 
     //Generador de id
     generateId = async() => {
         const products = await this.getProducts();
-
-        return String(products.length === 0 ? 1 : products.length + 1);
+        return String( products.length === 0 ? 1 : products.length + 1 );
     }
 
     
@@ -20,6 +21,7 @@ class ProductManager {
             title: Joi.string().required(),
             brand: Joi.string().required(),
             description: Joi.string().max(50),
+            category: Joi.string().max(50),
             price: Joi.number().integer().required(),
             thumbnail: Joi.string(),
             stock: Joi.number().integer().required()
@@ -49,9 +51,10 @@ class ProductManager {
             title: Joi.string(),
             brand: Joi.string(),
             description: Joi.string().max(50),
+            category: Joi.string().max(50),
             price: Joi.number().integer(),
             thumbnail: Joi.string(),
-            stock: Joi.number().integer()
+            stock: Joi.number().integer(),
         })    
 
         const { error } = ProductSchema.validate(product);
@@ -71,11 +74,13 @@ class ProductManager {
     
     }
     
-    getProducts = async () => {
+    //GET
+    getProducts = async() => {
         
         try {
             const products = await fs.promises.readFile(fileName, 'utf-8');
-            return JSON.parse(products);
+            if(products) return JSON.parse(products);
+            return [];
         }
         catch(error) {
             return error.message;
@@ -94,6 +99,7 @@ class ProductManager {
         }
     }
 
+    //POST
     addProduct = async(product) =>{
         
         try {
@@ -103,12 +109,9 @@ class ProductManager {
                 
                 const products = await this.getProducts();
                 
-                //genera id de producto y lo ubica como primer atributo
-                //product.id = await this.generateId();
-                //products.push(product);
-                products.push({id: await this.generateId(),...product});
+                products.push({ id: await this.generateId(),...product });
 
-                await fs.promises.writeFile(fileName, JSON.stringify(products));    
+                await fs.promises.writeFile(fileName, JSON.stringify(products, null, '\t'));    
                 return 'Product successfully added!';
             }
             else {
@@ -120,6 +123,7 @@ class ProductManager {
         }
     }
 
+    //PUT
     updateProduct = async(id,body) => {
         
         try {
@@ -135,7 +139,7 @@ class ProductManager {
                     const productUpdated = { ...products[index], ...body };
                     products.splice(index,1,productUpdated);
                     
-                    await fs.promises.writeFile(fileName, JSON.stringify(products));
+                    await fs.promises.writeFile(fileName, JSON.stringify(products, null, '\t'));
                     return productUpdated;
                 }
                 else 
@@ -150,6 +154,7 @@ class ProductManager {
         }
     }
 
+    //DELETE
     deleteProduct = async(id) => {
         try {
             const products = await this.getProducts();
@@ -159,7 +164,7 @@ class ProductManager {
             if( index != -1 ) {
                 products.splice(index,1);
     
-                await fs.promises.writeFile(fileName, JSON.stringify(products));
+                await fs.promises.writeFile(fileName, JSON.stringify(products, null, '\t'));
     
                 return `Product id: ${id} successfully removed!`;
             }
