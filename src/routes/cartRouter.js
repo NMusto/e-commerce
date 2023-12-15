@@ -13,13 +13,13 @@ cartRouter.get('/:cid', async(req,res) => {
         const cart = await cartManager.getCartById(cid);
 
         if( cart ) {
-            res.json(cart);
+            res.status(200).json(cart);
         }
-        else res.json(`Id ${cid} does not exist`);
+        else res.status(404).json(`Id ${cid} does not exist`);
         
     } 
     catch(error) {
-        res.send(error.message);
+        res.status(500).json({error: error.message});
     }
 })
 

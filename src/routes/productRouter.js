@@ -12,14 +12,14 @@ productRouter.get('/', async(req,res) => {
         const productManager = new ProductManager();
         const products = await productManager.getProducts();
         
-        if(!limit) res.json(products);
+        if(!limit) res.status(200).json(products);
         else {
             const limitProducts = products.slice(0,limit);
-            res.json(limitProducts);
+            res.status(200).json(limitProducts);
         }
     }
     catch(error) {
-        res.json({error: error.message});
+        res.status(500).json({error: error.message});
     }
 })
 
@@ -30,11 +30,11 @@ productRouter.get('/:pid', async(req,res) => {
         const productManager = new ProductManager();
         const product = await productManager.getProductByID(pid);
         
-        if( !product ) res.json(`Id ${pid} does not exist`);
-        res.json(product);
+        if( !product ) res.status(404).json(`Id ${pid} does not exist`);
+        res.status(200).json(product);
     }
     catch (error) {
-        res.send(error.message);
+        res.status(500).json({error: error.message});
     }
     
 })

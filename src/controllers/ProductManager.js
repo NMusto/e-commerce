@@ -1,9 +1,9 @@
 import fs from 'fs';
 import Joi from 'joi';
-import  __dirname  from '../../utils.js'
+import  __dirname  from '../utils.js'
 
 
-const fileName = __dirname + '/src/api/products.json';
+const fileName = __dirname + '/api/products.json';
 
 class ProductManager {
 
@@ -87,11 +87,11 @@ class ProductManager {
         }
     }
 
-    getProductByID = async(id) => {
+    getProductByID = async(pid) => {
         try {
             const products = await this.getProducts();
         
-            const product = products.find( product => product.id == id);
+            const product = products.find( product => product.id == pid);
             return product;
         }
         catch(error) {
@@ -124,7 +124,7 @@ class ProductManager {
     }
 
     //PUT
-    updateProduct = async(id,body) => {
+    updateProduct = async(pid,body) => {
         
         try {
             const objRta = this.validateUpdateProduct(body);
@@ -133,7 +133,7 @@ class ProductManager {
 
                 const products = await this.getProducts();
 
-                const index = products.findIndex( product => product.id === id);
+                const index = products.findIndex( product => product.id === pid);
                  if( index != -1 ) {
 
                     const productUpdated = { ...products[index], ...body };
@@ -155,21 +155,21 @@ class ProductManager {
     }
 
     //DELETE
-    deleteProduct = async(id) => {
+    deleteProduct = async(pid) => {
         try {
             const products = await this.getProducts();
 
-            const index = products.findIndex( product => product.id === id);
+            const index = products.findIndex( product => product.id === pid);
             
             if( index != -1 ) {
                 products.splice(index,1);
     
                 await fs.promises.writeFile(fileName, JSON.stringify(products, null, '\t'));
     
-                return `Product id: ${id} successfully removed!`;
+                return `Product id: ${pid} successfully removed!`;
             }
             else {
-                return `Product id: ${id} does not exist`;
+                return `Product id: ${pid} does not exist`;
             }
         }
         catch(error) {

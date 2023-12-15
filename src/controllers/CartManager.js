@@ -1,8 +1,8 @@
 import fs from 'fs';
-import __dirname from '../../utils.js';
+import __dirname from '../utils.js';
 import ProductManager from './ProductManager.js';
 
-const fileName = __dirname + '/src/api/carts.json';
+const fileName = __dirname + '/api/carts.json';
 
 class CartManager {
 
